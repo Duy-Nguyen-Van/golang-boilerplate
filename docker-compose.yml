@@ -1,0 +1,59 @@
+services:
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: ["./main"]
+  #   ports:
+  #     - "3001:3000"
+  #   env_file:
+  #     - cmd/server/.env
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - cmd/server/.env
+    command: ["start-dev"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:18-alpine
+    env_file:
+      - cmd/server/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  keycloak_data:
+
+networks:
+  app-network:
+    driver: bridge

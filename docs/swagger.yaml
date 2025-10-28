@@ -1,0 +1,631 @@
+basePath: /api/v1
+definitions:
+  constants.UserStatus:
+    enum:
+    - active
+    - inactive
+    type: string
+    x-enum-varnames:
+    - UserStatusActive
+    - UserStatusInactive
+  dtos.CompanyResponse:
+    properties:
+      created_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      id:
+        example: "123"
+        type: string
+      keycloak_id:
+        example: "123"
+        type: string
+      name:
+        example: John Doe
+        type: string
+      updated_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+    type: object
+  dtos.CreateCompanyRequest:
+    properties:
+      keycloak_id:
+        example: "123"
+        maxLength: 100
+        minLength: 2
+        type: string
+      name:
+        example: John Doe
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  dtos.CreateUserRequest:
+    properties:
+      companies:
+        items:
+          $ref: '#/definitions/dtos.UpdateCompanyRequest'
+        type: array
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        maxLength: 100
+        minLength: 2
+        type: string
+      keycloak_id:
+        example: "123"
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        example: Doe
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  dtos.HealthResponse:
+    properties:
+      service:
+        example: golang-boilerplate
+        type: string
+      status:
+        example: healthy
+        type: string
+      timestamp:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      version:
+        example: 1.0.0
+        type: string
+    type: object
+  dtos.Meta:
+    description: Metadata for pagination
+    properties:
+      code:
+        example: 400
+        type: integer
+      error_code:
+        example: BAD_REQUEST
+        type: string
+      message:
+        example: Request is invalid
+        type: string
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 20
+        type: integer
+      total:
+        example: 18
+        type: integer
+    type: object
+  dtos.UpdateCompanyRequest:
+    properties:
+      id:
+        example: "123"
+        maxLength: 100
+        minLength: 2
+        type: string
+      keycloak_id:
+        example: "123"
+        maxLength: 100
+        minLength: 2
+        type: string
+      name:
+        example: John Doe
+        maxLength: 100
+        minLength: 2
+        type: string
+    type: object
+  dtos.UpdateUserRequest:
+    properties:
+      companies:
+        items:
+          $ref: '#/definitions/dtos.UpdateCompanyRequest'
+        type: array
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        maxLength: 100
+        minLength: 2
+        type: string
+      keycloak_id:
+        example: "123"
+        maxLength: 100
+        minLength: 2
+        type: string
+      last_name:
+        example: Doe
+        maxLength: 100
+        minLength: 2
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/constants.UserStatus'
+        enum:
+        - active
+        - inactive
+        example: active
+    type: object
+  dtos.UserResponse:
+    properties:
+      companies:
+        items:
+          $ref: '#/definitions/dtos.CompanyResponse'
+        type: array
+      created_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+      email:
+        example: john.doe@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      id:
+        example: "123"
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      updated_at:
+        example: "2021-01-01T00:00:00Z"
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a backend API for Golang Boilerplate
+  title: Golang Boilerplate API
+  version: "1.0"
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Check if the service is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.HealthResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      summary: Health Check
+      tags:
+      - Health
+  /companies:
+    get:
+      consumes:
+      - application/json
+      description: Get companies
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Start date
+        example: '"2025-09-11T02:17:24.290538Z"'
+        in: query
+        name: start_date
+        type: string
+      - description: End date
+        example: '"2025-09-11T02:17:24.290538Z"'
+        in: query
+        name: end_date
+        type: string
+      - description: Query
+        example: '"A"'
+        in: query
+        name: q
+        type: string
+      - description: Sort
+        enum:
+        - created_at
+        - -created_at
+        - name
+        - -name
+        example: '"[-created_at,name]"'
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/dtos.CompanyResponse'
+                type: array
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get companies
+      tags:
+      - Company
+    post:
+      consumes:
+      - application/json
+      description: Create company
+      parameters:
+      - description: Company
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.CompanyResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create company
+      tags:
+      - Company
+  /companies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete company
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.CompanyResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete company
+      tags:
+      - Company
+    get:
+      consumes:
+      - application/json
+      description: Get company by ID
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.CompanyResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get company by ID
+      tags:
+      - Company
+    put:
+      consumes:
+      - application/json
+      description: Update company
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Company
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.CompanyResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update company
+      tags:
+      - Company
+  /health/database:
+    get:
+      consumes:
+      - application/json
+      description: Check if the database connection is healthy
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                type: object
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      summary: Database Health Check
+      tags:
+      - Health
+  /health/metrics:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed database connection metrics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                type: object
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      summary: Database Connection Metrics
+      tags:
+      - Health
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get users
+      parameters:
+      - default: 1
+        description: Page
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      - description: Start date
+        example: '"2025-09-11T02:17:24.290538Z"'
+        in: query
+        name: start_date
+        type: string
+      - description: End date
+        example: '"2025-09-11T02:17:24.290538Z"'
+        in: query
+        name: end_date
+        type: string
+      - description: Query
+        example: '"A"'
+        in: query
+        name: q
+        type: string
+      - description: Sort
+        enum:
+        - created_at
+        - -created_at
+        - name
+        - -name
+        example: '"[-created_at,name]"'
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/dtos.UserResponse'
+                type: array
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get users
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.UserResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create user
+      tags:
+      - User
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.UserResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.UserResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                $ref: '#/definitions/dtos.UserResponse'
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - User
+  /users/test-rest-client:
+    get:
+      consumes:
+      - application/json
+      description: Test rest client
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              data:
+                additionalProperties: true
+                type: object
+              meta:
+                $ref: '#/definitions/dtos.Meta'
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Test rest client
+      tags:
+      - User
+schemes:
+- http
+- https
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  BearerAuth:
+    description: Bearer Token Authentication. Use "Bearer {token}" as the value.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
