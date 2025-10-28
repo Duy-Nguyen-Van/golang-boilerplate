@@ -208,7 +208,7 @@ make up
 #### Create user (with JWT token)
 
 ```bash
-curl -X POST http://localhost:8080/v1/users \
+curl -X POST http://localhost:3000/v1/users \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "John Doe", "email": "john@example.com"}'
@@ -217,14 +217,14 @@ curl -X POST http://localhost:8080/v1/users \
 #### Get user by ID (with JWT token)
 
 ```bash
-curl -X GET http://localhost:8080/v1/users/123 \
+curl -X GET http://localhost:3000/v1/users/123 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 #### Create company (with JWT token)
 
 ```bash
-curl -X POST http://localhost:8080/v1/companies \
+curl -X POST http://localhost:3000/v1/companies \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "Acme Corp", "description": "A great company"}'
@@ -233,13 +233,13 @@ curl -X POST http://localhost:8080/v1/companies \
 #### Database health check
 
 ```bash
-curl -X GET http://localhost:8080/v1/health/database
+curl -X GET http://localhost:3000/v1/health/database
 ```
 
 #### Database metrics
 
 ```bash
-curl -X GET http://localhost:8080/v1/health/metrics
+curl -X GET http://localhost:3000/v1/health/metrics
 ```
 
 ## Development
@@ -283,7 +283,7 @@ Example request (non-production):
 
 ```bash
 curl -u "$BASIC_AUTH_USER:$BASIC_AUTH_SECRET" \
-  http://localhost:8080/v1/swagger/index.html
+  http://localhost:3000/v1/swagger/index.html
 ```
 
 ### Testing
@@ -487,7 +487,7 @@ Real-time monitoring of connection statistics:
 
 Set via `.env` (loaded by viper and godotenv):
 
-- **Server**: `APP_ENV`, `APP_NAME`, `APP_VERSION`, `TIMEZONE`, `APP_HTTP_SERVER` (e.g. `:8080`)
+- **Server**: `APP_ENV`, `APP_NAME`, `APP_VERSION`, `TIMEZONE`, `APP_HTTP_SERVER` (e.g. `:3000`)
 - **Database**: `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_DEBUG`
 - **Database Connection Pool**: `DATABASE_MAX_OPEN_CONNS` (default: 25), `DATABASE_MAX_IDLE_CONNS` (default: 5), `DATABASE_CONN_MAX_LIFETIME` (default: 5m), `DATABASE_CONN_MAX_IDLE_TIME` (default: 1m)
 - **Database Timeouts**: `DATABASE_CONNECT_TIMEOUT` (default: 30s), `DATABASE_QUERY_TIMEOUT` (default: 30s)
@@ -602,8 +602,8 @@ docker run -p 3000:3000 --env-file .env golang-boilerplate
 2. **Check Health Endpoints**
 
    ```bash
-   curl http://localhost:8080/v1/health/database
-   curl http://localhost:8080/v1/health/metrics
+   curl http://localhost:3000/v1/health/database
+   curl http://localhost:3000/v1/health/metrics
    ```
 
 3. **Monitor Logs**
