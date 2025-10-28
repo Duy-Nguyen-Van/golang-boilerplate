@@ -10,7 +10,6 @@ A production-ready Go web application built on Echo, featuring clean architectur
   - [Prerequisites](#prerequisites)
   - [Developer tools](#developer-tools)
   - [Setup](#setup)
-  - [Configure environment](#configure-environment)
 - [API Endpoints](#api-endpoints)
   - [Public Endpoints](#public-endpoints)
   - [Health Check Endpoints](#health-check-endpoints)
