@@ -144,21 +144,16 @@ go mod tidy
 
 #### 2. Configure environment
 
+##### 2.1. Configure migrations environment (goose)
+
 ```bash
-# Copy example and adjust as needed
-cp .env.example .env
+cp examples/env/migrations.env.example cmd/migrations/.env
 ```
 
-#### 2.1. Configure migrations environment (goose)
+##### 2.2. Configure server environment
 
 ```bash
-cp cmd/migrations/.env.example cmd/migrations/.env
-```
-
-#### 2.2. Configure server env for container (optional)
-
-```bash
-cp cmd/server/.env.example cmd/server/.env
+cp examples/env/server.env.example cmd/server/.env
 ```
 
 #### 3. Start dependencies with Docker
