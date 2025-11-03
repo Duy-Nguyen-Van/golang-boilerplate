@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"golang-boilerplate/internal/config"
 
@@ -87,10 +88,10 @@ func TestRestClient_Post(t *testing.T) {
 			defer server.Close()
 
 			cfg := &config.Config{
-				HTTPClientTimeout:            30,
+				HTTPClientTimeout:            60 * time.Second,
 				HTTPClientRetryCount:         0,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              false,
 				HTTPClientTLSInsecureSkipTLS: false,
 				AppName:                      "test-app",
@@ -161,10 +162,10 @@ func TestRestClient_Put(t *testing.T) {
 			defer server.Close()
 
 			cfg := &config.Config{
-				HTTPClientTimeout:            30,
+				HTTPClientTimeout:            60 * time.Second,
 				HTTPClientRetryCount:         0,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              false,
 				HTTPClientTLSInsecureSkipTLS: false,
 				AppName:                      "test-app",
@@ -265,10 +266,10 @@ func TestRestClient_Get(t *testing.T) {
 			defer server.Close()
 
 			cfg := &config.Config{
-				HTTPClientTimeout:            30,
+				HTTPClientTimeout:            60 * time.Second,
 				HTTPClientRetryCount:         0,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              false,
 				HTTPClientTLSInsecureSkipTLS: false,
 				AppName:                      "test-app",
@@ -341,10 +342,10 @@ func TestRestClient_Patch(t *testing.T) {
 			defer server.Close()
 
 			cfg := &config.Config{
-				HTTPClientTimeout:            30,
+				HTTPClientTimeout:            60 * time.Second,
 				HTTPClientRetryCount:         0,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              false,
 				HTTPClientTLSInsecureSkipTLS: false,
 				AppName:                      "test-app",
@@ -377,10 +378,10 @@ func TestProvideRestClient(t *testing.T) {
 		{
 			name: "success - create rest client with default config",
 			cfg: &config.Config{
-				HTTPClientTimeout:            30,
+				HTTPClientTimeout:            30 * time.Second,
 				HTTPClientRetryCount:         3,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              false,
 				HTTPClientTLSInsecureSkipTLS: false,
 				AppName:                      "test-app",
@@ -391,10 +392,10 @@ func TestProvideRestClient(t *testing.T) {
 		{
 			name: "success - create rest client with retry disabled",
 			cfg: &config.Config{
-				HTTPClientTimeout:            10,
+				HTTPClientTimeout:            10 * time.Second,
 				HTTPClientRetryCount:         0,
-				HTTPClientRetryWaitMin:       1,
-				HTTPClientRetryWaitMax:       5,
+				HTTPClientRetryWaitMin:       1 * time.Second,
+				HTTPClientRetryWaitMax:       5 * time.Second,
 				HTTPClientDebug:              true,
 				HTTPClientTLSInsecureSkipTLS: true,
 				AppName:                      "test-app",
@@ -420,10 +421,10 @@ func TestProvideRestClient(t *testing.T) {
 
 func TestRestClient_HeadersSet(t *testing.T) {
 	cfg := &config.Config{
-		HTTPClientTimeout:            30,
+		HTTPClientTimeout:            60 * time.Second,
 		HTTPClientRetryCount:         0,
-		HTTPClientRetryWaitMin:       1,
-		HTTPClientRetryWaitMax:       5,
+		HTTPClientRetryWaitMin:       1 * time.Second,
+		HTTPClientRetryWaitMax:       5 * time.Second,
 		HTTPClientDebug:              false,
 		HTTPClientTLSInsecureSkipTLS: false,
 		AppName:                      "test-app",
