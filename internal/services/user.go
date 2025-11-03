@@ -43,27 +43,28 @@ func ProvideUserService(
 
 func (s *userService) Create(ctx context.Context, req *dtos.CreateUserRequest) (*models.User, error) {
 	companies := []models.Company{}
-	for _, company := range req.Companies {
-		company, err := s.companyRepo.GetOneByID(company.ID)
+	for _, companyReq := range req.Companies {
+		companyID := companyReq.ID
+		company, err := s.companyRepo.GetOneByID(companyID)
 		if err != nil {
 			// Report to Sentry with context
 			if hub := sentry.GetHubFromContext(ctx); hub != nil {
 				hub.WithScope(func(scope *sentry.Scope) {
 					scope.SetTag("service", "user_service")
 					scope.SetTag("operation", "create_user")
-					scope.SetExtra("company_id", company.ID)
+					scope.SetExtra("company_id", companyID)
 					hub.CaptureException(err)
 				})
 			}
 
 			log.WithFields(log.Fields{
-				"company_id": company.ID,
+				"company_id": companyID,
 			}).Errorf("Failed to get company for user creation: %v", err)
 
 			return nil, errors.NotFoundError("Company", err).
 				WithOperation("create_user").
 				WithResource("company").
-				WithContext("company_id", company.ID)
+				WithContext("company_id", companyID)
 		}
 		companies = append(companies, *company)
 	}

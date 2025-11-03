@@ -19,6 +19,16 @@ A production-ready Go web application built on Echo, featuring clean architectur
   - [Available Make Commands](#available-make-commands)
   - [Swagger](#swagger)
   - [Testing](#testing)
+    - [Test Organization](#test-organization)
+    - [Running Tests](#running-tests)
+    - [Test Structure](#test-structure)
+    - [Test Package Naming](#test-package-naming)
+    - [Testing Different Layers](#testing-different-layers)
+    - [Example Test Files](#example-test-files)
+    - [Test Dependencies](#test-dependencies)
+    - [Best Practices](#best-practices)
+    - [Test Coverage](#test-coverage)
+    - [Continuous Integration](#continuous-integration)
 - [Architecture](#architecture)
   - [Dependency Injection with Uber FX](#dependency-injection-with-uber-fx)
   - [DTO & Model Layers](#dto--model-layers)
@@ -297,13 +307,26 @@ curl -X GET http://localhost:3000/v1/health/metrics
 ### Available Make Commands
 
 ```bash
+# Development
 make container-up         # Start Docker services (postgres, redis)
 make container-down       # Stop Docker services
 make up                   # Run the server (cmd/server)
 make build cmd=server service_name=main   # Build linux binary for server
 make dep                  # go mod tidy
-make tests                # Run tests
 make lint                 # Run golangci-lint
+make format               # Format code
+
+# Testing (see Testing section for details)
+make tests                # Run all tests with coverage and race detection
+make test-services        # Run service layer tests
+make test-utils           # Run utility tests
+make test-handlers        # Run handler tests
+make test-repositories    # Run repository tests
+make test-coverage        # Run tests with coverage
+make test-coverage-html   # Generate HTML coverage report
+make test-race            # Run tests with race detection
+make test-verbose         # Run tests with verbose output
+make test-specific TEST=TestName  # Run a specific test
 
 # Migrations (goose, reads env from cmd/migrations/.env)
 make migration-status
@@ -338,13 +361,245 @@ curl -u "$BASIC_AUTH_USER:$BASIC_AUTH_SECRET" \
 
 ### Testing
 
+This project follows Go testing conventions and best practices for organizing and writing unit tests.
+
+#### Test Organization
+
+Test files are placed in the **same directory** as the source code they test, with the `_test.go` suffix:
+
+```text
+internal/
+├── services/
+│   ├── user.go           # Source code
+│   └── user_test.go      # Unit tests for user service
+├── handlers/
+│   ├── user.go
+│   └── user_test.go      # Unit tests for user handler
+├── repositories/
+│   ├── user.go
+│   └── user_test.go      # Unit tests for user repository
+└── utils/
+    ├── date.go
+    └── date_test.go      # Unit tests for date utilities
+```
+
+#### Running Tests
+
+The project provides several Makefile targets for running tests:
+
+**Main Test Commands:**
+
 ```bash
-# Run all tests
+# Run all tests with coverage and race detection (recommended)
 make tests
 
-# Run specific package tests
-go test ./...
+# Run all tests with verbose output
+make test-verbose
+
+# Run all tests with coverage report
+make test-coverage
+
+# Generate HTML coverage report
+make test-coverage-html
+
+# Run tests with race detection
+make test-race
 ```
+
+**Layer-Specific Test Commands:**
+
+```bash
+# Run service layer tests
+make test-services
+
+# Run utility tests
+make test-utils
+
+# Run handler tests
+make test-handlers
+
+# Run repository tests
+make test-repositories
+```
+
+**Specific Test Commands:**
+
+```bash
+# Run a specific test function
+make test-specific TEST=TestUserService_Create
+
+# Run a specific test with verbose output
+make test-specific-verbose TEST=TestUserService_Create
+
+# Run a specific test with coverage
+make test-specific-coverage TEST=TestUserService_Create
+```
+
+**Direct Go Commands (alternative to Makefile):**
+
+```bash
+# Run tests for a specific package
+go test ./internal/services
+
+# Run tests for a specific package with coverage
+go test -cover ./internal/services
+
+# Run a specific test function
+go test -run TestUserService_Create ./internal/services
+
+# Generate HTML coverage report manually
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o coverage.html
+```
+
+#### Test Structure
+
+Tests follow a table-driven approach for multiple scenarios:
+
+```go
+func TestUserService_Create(t *testing.T) {
+    tests := []struct {
+        name          string
+        req           *dtos.CreateUserRequest
+        expectedError bool
+    }{
+        {
+            name:          "success - valid request",
+            req:           &dtos.CreateUserRequest{...},
+            expectedError: false,
+        },
+        {
+            name:          "error - invalid email",
+            req:           &dtos.CreateUserRequest{...},
+            expectedError: true,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            // Test implementation
+        })
+    }
+}
+```
+
+#### Test Package Naming
+
+**Same Package (White-box Testing):**
+
+- Uses the same package name as source code (e.g., `package services`)
+- Can test unexported functions and internal implementation
+- Best for unit tests that need access to internals
+
+**Test Package (Black-box Testing):**
+
+- Uses `_test` suffix (e.g., `package services_test`)
+- Tests only the public API
+- More resilient to internal refactoring
+
+#### Testing Different Layers
+
+**Repository Tests** (`internal/repositories/*_test.go`):
+
+- Test data access logic and database queries
+- Mock or use in-memory databases
+- Test CRUD operations, filters, sorting, pagination
+
+**Service Tests** (`internal/services/*_test.go`):
+
+- Test business logic and validation rules
+- Mock repository interfaces
+- Test error handling and orchestration
+
+**Handler Tests** (`internal/handlers/*_test.go`):
+
+- Test HTTP request/response handling
+- Use Echo test utilities
+- Mock service interfaces
+- Test authentication, validation, status codes
+
+**Utility Tests** (`internal/utils/*_test.go`):
+
+- Test pure functions and helper utilities
+- Usually no mocking needed
+- Focus on edge cases and correctness
+
+#### Example Test Files
+
+The project includes comprehensive test files demonstrating best practices:
+
+**Service Layer Tests:**
+
+- `internal/services/user_test.go` - User service with mocked repositories
+- `internal/services/company_test.go` - Company service tests
+- `internal/services/email_test.go` - Email service with mocked email sender
+- `internal/services/auth_test.go` - Auth service with mocked auth provider
+
+**Utility Tests:**
+
+- `internal/utils/date_test.go` - Date parsing and validation tests
+- `internal/utils/sort_test.go` - Sort validation with table-driven tests
+
+**HTTP Client Tests:**
+
+- `internal/httpclient/resty_test.go` - REST client integration tests
+
+#### Test Dependencies
+
+The project uses [testify](https://github.com/stretchr/testify) for assertions and mocking:
+
+- `assert` - Better assertions with helpful error messages
+- `require` - Same as assert but stops test execution on failure
+- `mock` - Mock objects for dependencies
+
+#### Best Practices
+
+1. **Keep tests isolated** - Each test should be independent
+2. **Test edge cases** - Don't just test the happy path
+3. **Use meaningful names** - Test names should describe what is being tested
+4. **Mock external dependencies** - Use interfaces to mock databases, APIs, etc.
+5. **Keep tests fast** - Unit tests should complete quickly
+6. **Test error cases** - Test both success and failure scenarios
+7. **Use table-driven tests** - For multiple test cases with similar structure
+8. **Avoid testing third-party code** - Focus on your own code
+
+#### Test Coverage
+
+Aim for good test coverage, especially for critical business logic:
+
+```bash
+# Check coverage for all packages
+go test -cover ./...
+
+# Generate detailed coverage report
+go test -coverprofile=coverage.out ./...
+go tool cover -func=coverage.out
+
+# View coverage in browser
+go tool cover -html=coverage.out
+```
+
+#### Continuous Integration
+
+Tests are automatically run in CI/CD pipelines. Ensure all tests pass before committing:
+
+```bash
+# Run full test suite before committing (recommended)
+make tests
+
+# Or run tests with race detection separately
+make test-race
+
+# Check test coverage
+make test-coverage-html
+```
+
+**Pre-commit Checklist:**
+
+- ✅ All tests pass: `make tests`
+- ✅ Code is formatted: `make format`
+- ✅ Linter passes: `make lint`
+- ✅ Coverage meets requirements: `make test-coverage`
 
 ## Architecture
 
