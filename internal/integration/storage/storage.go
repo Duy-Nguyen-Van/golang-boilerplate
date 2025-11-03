@@ -41,6 +41,14 @@ func ProvideStorageAdapter(config *config.Config) (StorageAdapter, error) {
 				WithResource("storage")
 		}
 		return gcsAdapter, nil
+	case constants.StorageProviderS3:
+		s3Adapter, err := NewS3Adapter(config)
+		if err != nil {
+			return nil, errors.ExternalServiceError("Failed to initialize S3 storage adapter", err).
+				WithOperation("initialize_storage_adapter").
+				WithResource("storage")
+		}
+		return s3Adapter, nil
 	default:
 		return nil, errors.InternalError("Invalid storage provider", fmt.Errorf("invalid storage provider: %s", config.StorageProvider)).
 			WithOperation("initialize_storage_adapter").

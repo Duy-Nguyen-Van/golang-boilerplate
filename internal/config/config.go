@@ -109,6 +109,11 @@ type Config struct {
 	GCSCredentialsJSONPath    string
 	GCSPresignedURLDuration   time.Duration
 	GCSPresignedURLExpiration time.Duration
+	S3Bucket                  string
+	S3Region                  string
+	S3AccessKey               string
+	S3SecretKey               string
+	S3PresignedURLDuration    time.Duration
 
 	// Payment configuration
 	PaymentProvider         string
@@ -198,6 +203,11 @@ func Load() (*Config, error) {
 		GCSCredentialsJSONPath:       getEnv("GCS_CREDENTIALS_JSON", ""),
 		GCSPresignedURLDuration:      getEnvAsDuration("GCS_PRESIGNED_URL_DURATION", 1*time.Hour),
 		GCSPresignedURLExpiration:    getEnvAsDuration("GCS_PRESIGNED_URL_EXPIRATION", 1*time.Hour),
+		S3Bucket:                     getEnv("S3_BUCKET", ""),
+		S3Region:                     getEnv("S3_REGION", ""),
+		S3AccessKey:                  getEnv("S3_ACCESS_KEY", ""),
+		S3SecretKey:                  getEnv("S3_SECRET_KEY", ""),
+		S3PresignedURLDuration:       getEnvAsDuration("S3_PRESIGNED_URL_DURATION", 1*time.Hour),
 		PaymentProvider:              getEnv("PAYMENT_PROVIDER", "stripe"),
 		StripeSecretKey:              getEnv("STRIPE_SECRET_KEY", ""),
 		StripePublicKey:              getEnv("STRIPE_PUBLIC_KEY", ""),
