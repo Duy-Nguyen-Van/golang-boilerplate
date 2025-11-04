@@ -31,6 +31,7 @@ services:
 
   postgres:
     image: postgres:18-alpine
+    restart: unless-stopped
     env_file:
       - cmd/server/.env
     ports:
@@ -42,6 +43,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
